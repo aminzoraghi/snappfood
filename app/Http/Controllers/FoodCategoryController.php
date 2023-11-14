@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreFoodCategoryRequest;
+use App\Http\Requests\UpdateFoodCategoryRequest;
 use App\Models\FoodCategory;
 use Illuminate\Http\Request;
 
@@ -10,51 +12,52 @@ class FoodCategoryController extends Controller
     public function index()
     {
         $foodCategories = FoodCategory::all();
-//        dd($foodCategories);
 
         return view('admin.food-categories.index', compact('foodCategories'));
     }
 
     public function create()
     {
-        return view('food-categories.create');
+        return view('admin.food-categories.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreFoodCategoryRequest $request)
     {
-        $foodCategory = new FoodCategory();
-        $foodCategory->fill($request->all());
-        $foodCategory->save();
-
-        return redirect()->route('food-categories.index');
+        try {
+            FoodCategory::query()->create($request->validated());
+            return redirect()->route('admin.food-categories.index')->with('success', 'category added successfully');
+        } catch (\Exception $e) {
+            return redirect(status: 500)->route('admin.food-categories.create')->with('error', $e->getMessage());
+        }
     }
-
     public function show(FoodCategory $foodCategory)
     {
-        return view('food-categories.show', compact('foodCategory'));
+        return view('admin.food-categories.show', compact('foodCategory'));
     }
 
     public function edit(FoodCategory $foodCategory)
     {
-        return view('food-categories.edit', compact('foodCategory'));
+        return view('admin.food-categories.edit', compact('foodCategory'));
     }
 
-    public
-
-    function
-
-    update(Request $request, FoodCategory $foodCategory)
+    public function update(UpdateFoodCategoryRequest $request, FoodCategory $foodCategory)
     {
-        $foodCategory->fill($request->all());
-        $foodCategory->save();
 
-        return redirect()->route('food-categories.index');
+       try {
+           $foodCategory->update($request->validated());
+           return redirect()->route('admin.food-categories.index')->with('success', 'category edit successfully');
+       } catch (\Exception $e) {
+           return redirect(status: 500)->route('admin.food-categories.edit')->with('error', $e->getMessage());
+       }
     }
 
     public function destroy(FoodCategory $foodCategory)
     {
-        $foodCategory->delete();
-
-        return redirect()->route('food-categories.index');
+        try {
+            $foodCategory->delete();
+            return redirect()->route('admin.food-categories.index')->with('success', 'category deleted successfully');
+        } catch (\Exception $e) {
+            return redirect(status: 500)->route('admin.food-categories.index')->with('error', $e->getMessage());
+        }
     }
 }
