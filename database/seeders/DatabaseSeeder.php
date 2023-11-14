@@ -19,5 +19,11 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
         $this->call(RoleSeeder::class);
+        \App\Models\RestaurantCategory::factory(10)->create();
+        \App\Models\FoodCategory::factory(10)->create();
+        \App\Models\Discount::factory(10)->create();
+        \App\Models\Banner::factory(10)->create();
+
+
     }
 }
