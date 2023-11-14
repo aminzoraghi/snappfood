@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class UpdateFoodCategoryRequest extends FormRequest
+class StoreRestaurantCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +22,7 @@ class UpdateFoodCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => ['bail',"required", "string",'min:3','max:25',Rule::unique('food_categories')->ignore($this->route()->food_category->id)],
+            "name" => ['bail',"required", "string",'min:3','max:25','unique:food_categories'],
             "description" => ['bail',"required", "string", "min:7", "max:255"],
         ];
     }

@@ -1,61 +1,62 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Http\Requests\StoreRestaurantCategoryRequest;
+use App\Http\Requests\UpdateRestaurantCategoryRequest;
 use App\Models\RestaurantCategory;
 use Illuminate\Http\Request;
 
 class RestaurantCategoryController extends Controller
 {
-//
     public function index()
     {
         $restaurantCategories = RestaurantCategory::all();
-        dd($restaurantCategories);
 
-        return view('restaurant-categories.index', compact('restaurantCategories'));
+        return view('admin.restaurant-categories.index', compact('restaurantCategories'));
     }
 
     public function create()
     {
-        return view('restaurant-categories.create');
+        return view('admin.restaurant-categories.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreRestaurantCategoryRequest $request)
     {
-        $restaurantCategory = new RestaurantCategory();
-        $restaurantCategory->fill($request->all());
-        $restaurantCategory->save();
-
-        return redirect()->route('restaurant-categories.index');
+        try {
+            RestaurantCategory::query()->create($request->validated());
+            return redirect()->route('admin.restaurant-categories.index')->with('success', 'category added successfully');
+        } catch (\Exception $e) {
+            return redirect(status: 500)->route('admin.restaurant-categories.create')->with('error', $e->getMessage());
+        }
     }
-
     public function show(RestaurantCategory $restaurantCategory)
     {
-        return view('restaurant-categories.show', compact('restaurantCategory'));
+        return view('admin.restaurant-categories.show', compact('restaurantCategory'));
     }
 
     public function edit(RestaurantCategory $restaurantCategory)
     {
-        return view('restaurant-categories.edit', compact('restaurantCategory'));
+        return view('admin.restaurant-categories.edit', compact('restaurantCategory'));
     }
 
-    public function update(Request $request, RestaurantCategory $restaurantCategory)
+    public function update(UpdateRestaurantCategoryRequest $request, RestaurantCategory $restaurantCategory)
     {
-        $restaurantCategory->fill($request->all());
-        $restaurantCategory->save();
 
-        return redirect()->route('restaurant-categories.index');
+        try {
+            $restaurantCategory->update($request->validated());
+            return redirect()->route('admin.restaurant-categories.index')->with('success', 'category edit successfully');
+        } catch (\Exception $e) {
+            return redirect(status: 500)->route('admin.restaurant-categories.edit')->with('error', $e->getMessage());
+        }
     }
 
-    public
-
-    function
-
-    destroy(RestaurantCategory $restaurantCategory)
+    public function destroy(RestaurantCategory $restaurantCategory)
     {
-        $restaurantCategory->delete();
-
-        return redirect()->route('restaurant-categories.index');
-    }
+        try {
+            $restaurantCategory->delete();
+            return redirect()->route('admin.restaurant-categories.index')->with('success', 'category deleted successfully');
+        } catch (\Exception $e) {
+            return redirect(status: 500)->route('admin.restaurant-categories.index')->with('error', $e->getMessage());
+        }
+    } 
 }
